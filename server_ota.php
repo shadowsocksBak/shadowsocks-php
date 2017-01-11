@@ -67,7 +67,7 @@ class ShadowSocksServer
 			'daemon'=>true,
 			'server'=>'0.0.0.0',
 			'server_port'=>444,
-			'password'=>'3pvpn.com',
+			'password'=>'yourpassword',
 			'method'=>'aes-256-cfb',
 			'ota_enable'=>false
 		];
