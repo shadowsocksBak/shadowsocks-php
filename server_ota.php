@@ -431,7 +431,9 @@ class ShadowSocksServer
 		//将是否是 OTA 一并返回
 		return array($addr_type, $dest_addr, $dest_port, $header_length,$ota_enable);
 	}
-
+	/*
+	* OTA 解析 部分的规则 by @Zac lvv2com@gmail.com
+	*/
 	function _ota_chunk_data($fd,$data){
 		//tcp 是流式传输，接收到的数据包可能不是一个完整的chunk 不能以strlen来判断长度然后直接return
 		$server_port	= $this->myClients[$fd]['info']['server_port'];
