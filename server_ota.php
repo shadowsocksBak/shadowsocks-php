@@ -1,4 +1,7 @@
 <?php
+/*
+created by lvv2.com @Zac
+ */
 include 'lib/autoload.php';
 // 状态相关
 define('STAGE_INIT', 0);
@@ -60,14 +63,13 @@ class ShadowSocksServer
 	protected $logger;
 	// config
 	protected $config;
-	public $dnsCache = array();	
 	public function __construct()
 	{
 		$this->config = [
 			'daemon'=>true,
 			'server'=>'0.0.0.0',
 			'server_port'=>444,
-			'password'=>'3pvpn.com',
+			'password'=>'yourpassword',
 			'method'=>'aes-256-cfb',
 			'ota_enable'=>false
 		];
@@ -86,7 +88,6 @@ class ShadowSocksServer
 	public function onWorkerStart($serv,$worker_id){
 		//每6小时清空一次dns缓存
 		swoole_timer_tick(21600000, function() {
-			$this->dnsCache = array();
 			swoole_clear_dns_cache();
 			$this->logger->info('Flush dnsCache');
 		});
@@ -216,11 +217,6 @@ class ShadowSocksServer
 					});
 
 					if ($header[0] == ADDRTYPE_HOST) {
-						if( isset($this->dnsCache[$header[1]]) ){
-							$ip = $this->dnsCache[$header[1]];
-							$this->logger->info("TCP hit dns cache {$header[1]}:{$ip} server port:{$server_port}");
-							$clientSocket->connect($ip, $header[2]);
-						}else
 						swoole_async_dns_lookup($header[1], function ($host, $ip) use ($header,$clientSocket,$fd) {
 							$remote_ip		= $this->myClients[$fd]['info']['remote_ip'];
 							$remote_port	= $this->myClients[$fd]['info']['remote_port'];
@@ -229,7 +225,6 @@ class ShadowSocksServer
 							$this->logger->info(
 								"TCP {$ota} connecting {$host}:{$header[2]} from {$remote_ip}:{$remote_port} server port:{$server_port} @line:".__LINE__
 							);
-							$this->dnsCache[$host] = $ip;
 							$clientSocket->connect($ip, $header[2]);
 							$this->myClients[$fd]['stage'] = STAGE_CONNECTING;
 						});
@@ -336,17 +331,12 @@ class ShadowSocksServer
 			}
 		});
 		if ($header[0] == ADDRTYPE_HOST) {
-			if( isset($this->dnsCache[$header[1]]) ){
-				$ip = $this->dnsCache[$header[1]];
-				$this->logger->info("UDP hit dns cache {$header[1]}:{$ip} server port:{$server_port}");
-				$clientSocket->connect($ip, $header[2]);
-			}else
-			swoole_async_dns_lookup($header[1], function ($host, $ip) use ($header, $clientSocket,$clientInfo,$server_port) {
+			swoole_async_dns_lookup($header[1], function ($host, $ip) use (&$header, $clientSocket,$clientInfo,$server_port) {
 				$ota = $header[4] ? 'OTA' : '';
 				$this->logger->info(
 					"UDP {$ota} connecting {$host}:{$header[2]} from {$clientInfo['address']}:{$clientInfo['port']} server port:{$server_port}"
-				);				
-				$this->dnsCache[$host] = $ip;
+				);
+				$header[1]	=	$ip;
 				$clientSocket->connect($ip, $header[2]);
 			});
 		} elseif ($header[0] == ADDRTYPE_IPV4) {
@@ -359,23 +349,23 @@ class ShadowSocksServer
 
 		}
 	}
+	/*
+	UDP 部分 返回客户端 头部数据 by @Zac lvv2com@gmail.com
 	//生成UDP header 它这里给返回解析出来的域名貌似给udp dns域名解析用的
+	*/
 	public function pack_header($addr,$addr_type,$port){
 		$header = '';
 		//$ip = pack('N',ip2long($addr));
-		if(isset($this->dnsCache[$addr])){
-			$ip = $this->dnsCache[$addr];
-			//判断是否是合法的公共IPv4地址，192.168.1.1这类的私有IP地址将会排除在外
-			if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
-				// it's valid
-				$addr = $ip;
-				$addr_type = ADDRTYPE_IPV4;
-			//判断是否是合法的IPv6地址
-			}elseif(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)){
-				$addr = $ip;
-				$addr_type = ADDRTYPE_IPV6;
-			}
+		//判断是否是合法的公共IPv4地址，192.168.1.1这类的私有IP地址将会排除在外
+		/*
+		if(filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
+			// it's valid
+			$addr_type = ADDRTYPE_IPV4;
+		//判断是否是合法的IPv6地址
+		}elseif(filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)){
+			$addr_type = ADDRTYPE_IPV6;
 		}
+		*/
 		switch ($addr_type) {
 			case ADDRTYPE_IPV4:
 				$header = b"\x01".inet_pton($addr);
@@ -393,7 +383,7 @@ class ShadowSocksServer
 				return;
 		}
 		return $header.pack('n',$port);
-	}	
+	}
 	function onClose($serv, $fd, $from_id)
 	{
 		//清理掉后端连接
@@ -457,6 +447,9 @@ class ShadowSocksServer
 		return array($addr_type, $dest_addr, $dest_port, $header_length,$ota_enable);
 	}
 
+	/*
+		ss OTA 功能拆包部分 by @Zac lvv2com@gmail.com
+	*/
 	function _ota_chunk_data($fd,$data){
 		//tcp 是流式传输，接收到的数据包可能不是一个完整的chunk 不能以strlen来判断长度然后直接return
 		$server_port	= $this->myClients[$fd]['info']['server_port'];
