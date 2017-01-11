@@ -67,7 +67,7 @@ class ShadowSocksServer
 			'daemon'=>true,
 			'server'=>'0.0.0.0',
 			'server_port'=>444,
-			'password'=>'yourpassword',
+			'password'=>'3pvpn.com',
 			'method'=>'aes-256-cfb',
 			'ota_enable'=>false
 		];
@@ -83,7 +83,24 @@ class ShadowSocksServer
 		
 		$this->logger = new Logger();
 	}
-
+	public function onWorkerStart($serv,$worker_id){
+		//每6小时清空一次dns缓存
+		swoole_timer_tick(21600000, function() {
+			$this->dnsCache = array();
+			swoole_clear_dns_cache();
+			$this->logger->info('Flush dnsCache');
+		});
+	}
+	//缓冲区控制	
+	public function onBufferFull($serv, $fd)
+	{
+		$this->myClients[$fd]['overflowed']		= true;
+		$this->logger->info("server is overflowed connection[fd=$fd]");
+	}
+	public function onBufferEmpty($serv,$fd)
+	{
+		$this->myClients[$fd]['overflowed']		= false;
+	}
 	public function onConnect($serv, $fd)
 	{
 		// 设置当前连接的状态为 STAGE_INIT ，初始状态
@@ -92,9 +109,11 @@ class ShadowSocksServer
 		}
 		
 		$this->myClients[$fd]['info']			= $serv->connection_info($fd);//server_port
-		$this->myClients[$fd]['encryptor'] = new Encryptor($this->config['password'], $this->config['method']);
+		$this->myClients[$fd]['encryptor']		= new Encryptor($this->config['password'], $this->config['method']);
 		//初始化各属性
-		$this->myClients[$fd]['splQueue'] = new SplQueue();
+		$this->myClients[$fd]['splQueue'] 		= new SplQueue();
+		//判断缓冲区是否已满
+		$this->myClients[$fd]['overflowed']		= false;
 		
 		//$this->myClients[$fd]['ota_enable'] = $this->config['ota_enable'];
 		$this->myClients[$fd]['_ota_chunk_idx'] = 0;
@@ -180,14 +199,20 @@ class ShadowSocksServer
 						}
 					});
 					$clientSocket->on('receive', function (swoole_client $clientSocket, $_data) use ($fd) {
-						//$errCode = $serv->getLastError(); if (1008 == $errCode)//缓存区已满
-						//先判断 send或者 push的返回是否为false, 然后调用 getLastError得到错误码，进行对应的处理逻辑
-						try{	
-							$_data = $this->myClients[$fd]['encryptor']->encrypt($_data);
-							$this->serv->send($fd,$_data);
-						}catch(Exception $e){
-							var_dump($e);
+						$_data = $this->myClients[$fd]['encryptor']->encrypt($_data);
+						if( isset($this->myClients[$fd]['overflowed']) && $this->myClients[$fd]['overflowed']==false ){
+							$res = $this->serv->send($fd,$_data);
+							if($res){
+								//todo流量统计
+							}else{
+								$errCode = $this->serv->getLastError(); 
+								if (1008 == $errCode){//缓存区已满
+								}else{
+									$this->logger->info("send uncatched errCode:$errCode");	
+								}
+							}							
 						}
+						
 					});
 
 					if ($header[0] == ADDRTYPE_HOST) {
@@ -431,9 +456,7 @@ class ShadowSocksServer
 		//将是否是 OTA 一并返回
 		return array($addr_type, $dest_addr, $dest_port, $header_length,$ota_enable);
 	}
-	/*
-	* OTA 解析 部分的规则 by @Zac lvv2com@gmail.com
-	*/
+
 	function _ota_chunk_data($fd,$data){
 		//tcp 是流式传输，接收到的数据包可能不是一个完整的chunk 不能以strlen来判断长度然后直接return
 		$server_port	= $this->myClients[$fd]['info']['server_port'];
