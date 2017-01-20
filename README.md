@@ -79,7 +79,7 @@ phpize</br>
 ./configure && sudo make && sudo make install</br></br>
 
 
-编辑  /usr/local/php7/etc/php.ini 加入 extension=swoole.so</br>
+编辑  /usr/local/php56/etc/php.ini 加入 extension=swoole.so</br>
 php --ri swoole 可查看swoole 扩展详细信息</br>
 也可通过 php -m 或 phpinfo() 来查看是否成功加载了swoole，</br>
 如果没有可能 是php.ini 的路径不对，</br>
