@@ -194,10 +194,12 @@ class ShadowSocksServer
 						$this->serv->close($fd);
 					});
 					$clientSocket->on('close', function (swoole_client $clientSocket) use ($fd) {
-						unset($this->myClients[$fd]);
 						if (!$clientSocket->closing) {
+							$clientSocket->closing = true;
 							$this->serv->close($fd);
 						}
+						if ( isset($this->myClients[$fd]) )  unset($this->myClients[$fd]);
+						//$this->logger->info( "client {$fd} closed memory_get_usage:" . memory_get_usage() );
 					});
 					$clientSocket->on('receive', function (swoole_client $clientSocket, $_data) use ($fd) {
 						$_data = $this->myClients[$fd]['encryptor']->encrypt($_data);
@@ -218,14 +220,16 @@ class ShadowSocksServer
 
 					if ($header[0] == ADDRTYPE_HOST) {
 						swoole_async_dns_lookup($header[1], function ($host, $ip) use ($header,$clientSocket,$fd) {
-							$remote_ip		= $this->myClients[$fd]['info']['remote_ip'];
+							$remote_ip	= $this->myClients[$fd]['info']['remote_ip'];
 							$remote_port	= $this->myClients[$fd]['info']['remote_port'];
 							$server_port	= $this->myClients[$fd]['info']['server_port'];
 							$ota = $header[4] ? 'OTA' : '';
 							$this->logger->info(
 								"TCP {$ota} connecting {$host}:{$header[2]} from {$remote_ip}:{$remote_port} server port:{$server_port} @line:".__LINE__
 							);
-							$clientSocket->connect($ip, $header[2]);
+							if( $ip && 0<$header[2] && $server_port ){
+								$clientSocket->connect($ip, $header[2]);
+							}							
 							$this->myClients[$fd]['stage'] = STAGE_CONNECTING;
 						});
 					} elseif ($header[0] == ADDRTYPE_IPV4) {
@@ -387,11 +391,12 @@ class ShadowSocksServer
 	function onClose($serv, $fd, $from_id)
 	{
 		//清理掉后端连接
-		if (isset($this->myClients[$fd]['clientSocket'])) {
+		if ( isset( $this->myClients[$fd]['clientSocket'] ) && $this->myClients[$fd]['clientSocket']->closing === false) {
 			$this->myClients[$fd]['clientSocket']->closing = true;
 			$this->myClients[$fd]['clientSocket']->close();
-			unset($this->myClients[$fd]);
 		}
+		if ( isset($this->myClients[$fd]) )  unset($this->myClients[$fd]);
+		//$this->logger->info( "server {$fd} closed memory_get_usage:" . memory_get_usage() );
 	}
 
 	public function start()
