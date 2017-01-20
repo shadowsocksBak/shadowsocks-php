@@ -89,6 +89,10 @@ php --ri swoole 可查看swoole 扩展详细信息</br>
 也可通过 php -m 或 phpinfo() 来查看是否成功加载了swoole，</br>
 如果没有可能 是php.ini 的路径不对，</br>
 可以使用 php -i | grep php.ini 来定位到 php.ini 的绝对路径</br>
-
+## 其他
+加密类使用了 [https://github.com/walkor/shadowsocks-php](workerman) 版本的实现</br>
+server 参照 <https://github.com/Iceux/shadowsocks-php></br>
+自己实现了 OTA 部分 和参照 python 的ss 实现了udp部分，以及其他优化。</br>
+在服务器上稳定运行，一切正常，内存消耗低。
 ## License
 GPLv3 and latest
