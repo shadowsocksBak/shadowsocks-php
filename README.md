@@ -5,7 +5,8 @@ php+swoole 版本的 shadowsocks ota 版本实现
 <http://wiki.swoole.com/wiki/page/6.html>
 
 ### php 安装
-php -v 查看php版本,如果是php-5.3.10 或更高版本 则可直接安装swoole 扩展 </br>
+php -v 查看php版本,如果是php-5.3.10 或更高版本 则可略过此步骤，直接安装swoole 扩展 </br>
+
 yum install -y openssl* openssl openssl-devel ncurses-devel</br>
 yum install -y libxml* libxml2-devel</br>
 yum install -y libcurl* curl-devel</br>
