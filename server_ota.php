@@ -1,6 +1,6 @@
 <?php
 /*
-created by lvv2.com @Zac
+created by @Zac
  */
 include 'lib/autoload.php';
 // 状态相关
@@ -266,7 +266,7 @@ class ShadowSocksServer
 		}
 	}
 	/*
-	UDP 代理部分的规则 by @Zac lvv2com@gmail.com
+	UDP 代理部分的规则 by @Zac 
 	$clientInfo
 	Array
 	(
@@ -354,7 +354,7 @@ class ShadowSocksServer
 		}
 	}
 	/*
-	UDP 部分 返回客户端 头部数据 by @Zac lvv2com@gmail.com
+	UDP 部分 返回客户端 头部数据 by @Zac 
 	//生成UDP header 它这里给返回解析出来的域名貌似给udp dns域名解析用的
 	*/
 	public function pack_header($addr,$addr_type,$port){
@@ -453,7 +453,7 @@ class ShadowSocksServer
 	}
 
 	/*
-		ss OTA 功能拆包部分 by @Zac lvv2com@gmail.com
+		ss OTA 功能拆包部分 by @Zac 
 	*/
 	function _ota_chunk_data($fd,$data){
 		//tcp 是流式传输，接收到的数据包可能不是一个完整的chunk 不能以strlen来判断长度然后直接return
