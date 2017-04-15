@@ -18,42 +18,42 @@ yum install -y libmcrypt libmcrypt-devel</br></br>
 wget -c <http://cn2.php.net/distributions/php-5.6.29.tar.gz></br>
 tar zxvf php-5.6.29.tar.gz</br>
 cd php-5.6.29</br>
-./configure \</br>
---prefix=/usr/local/php56 \</br>
---with-config-file-path=/usr/local/php56/etc \</br>
---enable-fpm \</br>
---with-fpm-user=www \</br>
---with-fpm-group=www \</br>
---with-mysqli=mysqlnd \</br>
---with-pdo-mysql=mysqlnd \</br>
---with-iconv-dir \</br>
---with-freetype-dir=/usr/local/freetype \</br>
---with-jpeg-dir \</br>
---with-png-dir \</br>
---with-zlib \</br>
---with-libxml-dir=/usr \</br>
---enable-xml \</br>
---disable-rpath \</br>
---enable-bcmath \</br>
---enable-shmop \</br>
---enable-sysvsem \</br>
---enable-inline-optimization \</br>
---with-curl \</br>
---enable-mbregex \</br>
---enable-mbstring \</br>
---with-mcrypt \</br>
---enable-ftp \</br>
---with-gd \</br>
---enable-gd-native-ttf \</br>
---with-openssl \</br>
---with-mhash \</br>
---enable-pcntl \</br>
---enable-sockets \</br>
---with-xmlrpc \</br>
---enable-zip \</br>
---enable-soap \</br>
---with-gettext \</br>
---disable-fileinfo \</br>
+./configure \ </br>
+--prefix=/usr/local/php56 \ </br>
+--with-config-file-path=/usr/local/php56/etc \ </br>
+--enable-fpm \ </br>
+--with-fpm-user=www \ </br>
+--with-fpm-group=www \ </br>
+--with-mysqli=mysqlnd \ </br>
+--with-pdo-mysql=mysqlnd \ </br>
+--with-iconv-dir \ </br>
+--with-freetype-dir=/usr/local/freetype \ </br>
+--with-jpeg-dir \ </br>
+--with-png-dir \ </br>
+--with-zlib \ </br>
+--with-libxml-dir=/usr \ </br>
+--enable-xml \ </br>
+--disable-rpath \ </br>
+--enable-bcmath \ </br>
+--enable-shmop \ </br>
+--enable-sysvsem \ </br>
+--enable-inline-optimization \ </br>
+--with-curl \ </br>
+--enable-mbregex \ </br>
+--enable-mbstring \ </br>
+--with-mcrypt \ </br>
+--enable-ftp \ </br>
+--with-gd \ </br>
+--enable-gd-native-ttf \ </br>
+--with-openssl \ </br>
+--with-mhash \ </br>
+--enable-pcntl \ </br>
+--enable-sockets \ </br>
+--with-xmlrpc \ </br>
+--enable-zip \ </br>
+--enable-soap \ </br>
+--with-gettext \ </br>
+--disable-fileinfo \ </br>
 --enable-opcache</br>
 
 
