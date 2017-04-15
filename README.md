@@ -15,7 +15,7 @@ yum install -y libpng-devel</br>
 yum install -y freetype-devel</br>
 yum install -y libmcrypt libmcrypt-devel</br></br>
 
-wget -c <http://jp2.php.net/get/php-5.6.29.tar.gz></br>
+wget -c <http://cn2.php.net/distributions/php-5.6.29.tar.gz></br>
 tar zxvf php-5.6.29.tar.gz</br>
 cd php-5.6.29</br>
 ./configure \ </br>
