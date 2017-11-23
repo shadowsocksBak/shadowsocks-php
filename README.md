@@ -53,7 +53,7 @@ cd php-5.6.29</br>
 --enable-zip \ </br>
 --enable-soap \ </br>
 --with-gettext \ </br>
---disable-fileinfo \ </br>
+--enable-fileinfo \ </br>
 --enable-opcache</br>
 
 
@@ -70,6 +70,7 @@ ln -s /usr/local/php56/bin/pecl /usr/bin/pecl</br>
 ln -s /usr/local/php56/bin/php-cgi /usr/bin/php-cgi</br>
 ln -s /usr/local/php56/bin/php-config /usr/bin/php-config</br>
 ln -s /usr/local/php56/bin/phpdbg /usr/bin/phpdbg</br>
+ln -s /usr/local/php56/sbin/php-fpm /usr/bin/php-fpm</br>
 ### swoole 扩展安装</br>
 <http://wiki.swoole.com/wiki/page/6.html></br>
 可直接通过 pecl安装 也可编译安装。</br>
