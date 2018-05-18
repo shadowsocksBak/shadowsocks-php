@@ -7,6 +7,7 @@ yum  install epel-release  //扩展包更新包</br>
 yum  update //更新yum源</br>
 yum install lrzsz</br>
 yum  install gcc</br>
+yum install nload //查看网卡速率</br>
 ### php 安装
 php -v 查看php版本,如果是php-5.3.10 或更高版本 则可略过此步骤，直接安装swoole 扩展 </br>
 
