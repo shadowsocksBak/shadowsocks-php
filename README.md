@@ -3,7 +3,10 @@ php+swoole 版本的 shadowsocks ota 版本实现
 ## centos　php 和 swoole 安装（环境搭建）
 
 <http://wiki.swoole.com/wiki/page/6.html>
-
+yum  install epel-release  //扩展包更新包
+yum  update //更新yum源
+yum install lrzsz
+yum  install gcc
 ### php 安装
 php -v 查看php版本,如果是php-5.3.10 或更高版本 则可略过此步骤，直接安装swoole 扩展 </br>
 
