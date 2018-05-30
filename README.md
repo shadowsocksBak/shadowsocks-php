@@ -6,7 +6,7 @@ php+swoole 版本的 shadowsocks ota 版本实现
 yum  install -y epel-release  //扩展包更新包</br>
 yum  update //更新yum源</br>
 yum install -y nload //查看网卡速率</br>
-yum install -y net-tools yum vim gcc lrzsz</br>
+yum install -y net-tools yum vim gcc lrzsz wget </br>
 ### php 安装
 php -v 查看php版本,如果是php-5.3.10 或更高版本 则可略过此步骤，直接安装swoole 扩展 </br>
 
